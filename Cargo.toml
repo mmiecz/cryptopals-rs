@@ -1,0 +1,22 @@
+[package]
+name = "cryptopals"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hex = "0.4.3"
+base64 = "0.13.0"
+
+[lib]
+name = "common"
+path = "src/common/mod.rs"
+
+[[bin]]
+name = "chapter1-1"
+path = "src/chapter1/part1/main.rs"
+
+[[bin]]
+name = "chapter1-2"
+path = "src/chapter1/part2/main.rs"
