@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 hex = "0.4.3"
 base64 = "0.13.0"
+phf = {version = "0.10.1", features = ["macros"]}
 
 [lib]
 name = "common"
@@ -24,3 +25,11 @@ path = "src/chapter1/part2/main.rs"
 [[bin]]
 name = "chapter1-3"
 path = "src/chapter1/part3/main.rs"
+
+[[bin]]
+name = "chapter1-4"
+path = "src/chapter1/part4/main.rs"
+
+[[bin]]
+name = "chapter1-5"
+path = "src/chapter1/part5/main.rs"
