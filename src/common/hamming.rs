@@ -18,7 +18,7 @@ mod tests {
     fn proper_hamming_distance_on_string() {
         let s1 = "this is a test";
         let s2 = "wokka wokka!!!";
-        let dist = hamming(&s1.as_bytes(), &s2.as_bytes());
+        let dist = hamming(s1.as_bytes(), s2.as_bytes());
         assert_eq!(dist, 37);
     }
 }

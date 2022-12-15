@@ -1,8 +1,7 @@
-use base64;
 use common::{
     english_detector::EnglishDetector,
     hamming::hamming,
-    xor::{xor_repeating_key, xor_single_byte},
+    xor::{xor_decrypt_single_byte, xor_decrypt_with_repeating_key},
 };
 use log::{debug, info};
 
@@ -10,29 +9,13 @@ use log::{debug, info};
 fn find_best_key_sizes(input: &[u8]) -> Vec<usize> {
     let mut key_scores = Vec::new();
     for key_size in 2..=40 {
-        if let Some(score) = get_keysize_hamming_score(&input, key_size) {
+        if let Some(score) = get_keysize_hamming_score(input, key_size) {
             key_scores.push((score, key_size));
         }
     }
     key_scores.sort_by(|(s1, _), (s2, _)| s1.partial_cmp(s2).unwrap());
     debug!("{:?}", key_scores);
     key_scores.iter().map(|(_, len)| *len).take(5).collect()
-}
-
-// Calculate score of single char.
-// More popular english letters (e, t, a o ) have higher score than the lower ones
-// Non-ascii char has 0 score
-fn letter_score(letter: u8) -> u32 {
-    static COMMON_ENGLISH_LETTERS: &str = " ETAONRISHDLFCMUGYPWBVKJXZQ";
-    if let Some(position) = COMMON_ENGLISH_LETTERS.find(letter.to_ascii_uppercase() as char) {
-        100 - position as u32 * 2 // letters that are more common have higher score
-    } else {
-        if letter.is_ascii_alphanumeric() {
-            10
-        } else {
-            0
-        }
-    }
 }
 
 // returns normalized hamming distance score for given key_size.
@@ -50,9 +33,8 @@ fn get_keysize_hamming_score(text: &[u8], key_size: usize) -> Option<f32> {
             break;
         }
         let left_chunk = &big_chunk[0..chunk_size];
-        let right_chunk_end = chunk_size * 2;
-        let right_chunk = &big_chunk[chunk_size..right_chunk_end];
-        let hamming_distance = hamming(&left_chunk, &right_chunk);
+        let right_chunk = &big_chunk[chunk_size..chunk_size * 2];
+        let hamming_distance = hamming(left_chunk, right_chunk);
         score += hamming_distance as f32;
         measures += 1;
     }
@@ -70,7 +52,7 @@ fn find_best_single_xor_key(input: &[u8], key_len: usize) -> u8 {
     }
     let mut max_score_byte: (f32, u8) = (0.0, 0);
     for k in 0..255 {
-        let decoded_bytes = xor_single_byte(input, k); // decodes input string, result will be used to determine xor key score
+        let decoded_bytes = xor_decrypt_single_byte(input, k); // decodes input string, result will be used to determine xor key score
         let mut score = 0.0;
         for byte in decoded_bytes.iter() {
             score += EnglishDetector::calculate_english_letter_score(*byte) as f32;
@@ -116,7 +98,7 @@ fn main() {
     debug!("Found best key sizes: {:?}", key_sizes);
     let encryption_key = find_key(&input, key_sizes[0]);
     let key = String::from_utf8_lossy(&encryption_key);
-    let decrypted_bytes = xor_repeating_key(&input, &encryption_key);
+    let decrypted_bytes = xor_decrypt_with_repeating_key(&input, &encryption_key);
     let message_decrypted = String::from_utf8_lossy(&decrypted_bytes);
     println!("found: {key}");
     println!("decrypted message: {message_decrypted}");

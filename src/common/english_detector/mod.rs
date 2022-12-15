@@ -1,15 +1,45 @@
+use once_cell::sync::Lazy;
 use std::collections::{HashMap, HashSet};
 use std::io::BufRead;
 use std::path::Path;
 
+static ENGLISH_LETTERS_FREQ: Lazy<HashMap<u8, u32>> = Lazy::new(|| {
+    [
+        (b' ', 12100),
+        (b'e', 12000),
+        (b't', 9000),
+        (b'a', 8000),
+        (b'i', 8000),
+        (b'o', 8000),
+        (b'n', 8000),
+        (b's', 8000),
+        (b'h', 6400),
+        (b'r', 6200),
+        (b'd', 4400),
+        (b'l', 4000),
+        (b'u', 3400),
+        (b'c', 3000),
+        (b'm', 3000),
+        (b'f', 2500),
+        (b'w', 2000),
+        (b'y', 2000),
+        (b'g', 1700),
+        (b'p', 1700),
+        (b'b', 1600),
+        (b'v', 1200),
+        (b'k', 800),
+        (b'q', 500),
+        (b'j', 400),
+        (b'x', 400),
+        (b'z', 200),
+    ]
+    .iter()
+    .cloned()
+    .collect()
+});
 ///Simple language detector based on dictionary
 pub struct EnglishDetector {
     dict: HashSet<String>,
-}
-
-struct TextDetectorStats {
-    words_total: u32,
-    known_words: u32,
 }
 
 impl EnglishDetector {
@@ -66,38 +96,7 @@ impl EnglishDetector {
             return 100;
         }
         let ch = ch.to_ascii_lowercase();
-        let letter_scores: HashMap<u8, u32> = [
-            (b' ', 12100),
-            (b'e', 12000),
-            (b't', 9000),
-            (b'a', 8000),
-            (b'i', 8000),
-            (b'o', 8000),
-            (b'n', 8000),
-            (b's', 8000),
-            (b'h', 6400),
-            (b'r', 6200),
-            (b'd', 4400),
-            (b'l', 4000),
-            (b'u', 3400),
-            (b'c', 3000),
-            (b'm', 3000),
-            (b'f', 2500),
-            (b'w', 2000),
-            (b'y', 2000),
-            (b'g', 1700),
-            (b'p', 1700),
-            (b'b', 1600),
-            (b'v', 1200),
-            (b'k', 800),
-            (b'q', 500),
-            (b'j', 400),
-            (b'x', 400),
-            (b'z', 200),
-        ]
-        .iter()
-        .cloned()
-        .collect();
+        let letter_scores = &ENGLISH_LETTERS_FREQ;
         match letter_scores.get(&ch) {
             Some(score) => *score,
             None => 100,
@@ -115,7 +114,7 @@ mod tests {
             EnglishDetector::init("assets/words.txt").expect("Can't load dict file");
 
         let text = "To be or not to be";
-        let confidence = english_detector.detect_english(&text.as_bytes());
+        let confidence = english_detector.detect_english(text.as_bytes());
         assert_eq!(confidence, 100);
     }
 }

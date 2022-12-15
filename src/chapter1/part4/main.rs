@@ -1,5 +1,5 @@
 use common::english_detector::EnglishDetector;
-use common::xor::xor_single_byte;
+use common::xor::xor_decrypt_single_byte;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fs::File;
@@ -32,9 +32,9 @@ fn main() {
     let mut results = BinaryHeap::with_capacity(60);
     for line in lines {
         let line = line.unwrap();
-        let hexed = hex::decode(&line).expect("Decode error");
+        let hexed = hex::decode(line).expect("Decode error");
         for key in 0..=255 {
-            let decrypted = xor_single_byte(&hexed, key);
+            let decrypted = xor_decrypt_single_byte(&hexed, key);
             let score = english_detector.detect_english(&decrypted);
 
             if score > 0 {

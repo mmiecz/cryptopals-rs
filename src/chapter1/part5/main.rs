@@ -1,10 +1,10 @@
-use common::xor::xor_repeating_key;
-use hex;
+use common::xor::xor_decrypt_with_repeating_key;
+
 fn main() {
     let msg = r#"Burning 'em, if you ain't quick and nimble
 I go crazy when I hear a cymbal"#;
     let key = "ICE";
-    let res = xor_repeating_key(&msg.as_bytes(), &key.as_bytes());
+    let res = xor_decrypt_with_repeating_key(msg.as_bytes(), key.as_bytes());
     let hex = hex::encode(res);
     println!("{hex}");
     assert_eq!(

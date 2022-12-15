@@ -1,6 +1,6 @@
 use common::english_detector::EnglishDetector;
 use common::xor;
-use common::xor::xor;
+
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 
@@ -29,7 +29,7 @@ fn main() {
     let mut score_heap = BinaryHeap::new();
     let english_detector = EnglishDetector::init("assets/words.txt").expect("Can't open dict file");
     for key in 0..=255 {
-        let key_decrypted = xor::xor_single_byte(&encrypted, key);
+        let key_decrypted = xor::xor_decrypt_single_byte(&encrypted, key);
         let score = english_detector.detect_english(&key_decrypted);
         score_heap.push(ScoredKey {
             score,
@@ -42,7 +42,7 @@ fn main() {
     for item in score_heap.iter().take(5) {
         println!(
             "Decrypted text: {}, Key: {:#x}, Score: {}",
-            String::from_utf8_lossy(&item.decrypted_msg).to_string(),
+            String::from_utf8_lossy(&item.decrypted_msg),
             item.key,
             item.score
         );
