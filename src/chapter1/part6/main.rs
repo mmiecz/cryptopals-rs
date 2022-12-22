@@ -97,9 +97,9 @@ fn main() {
     let key_sizes = find_best_key_sizes(&input);
     debug!("Found best key sizes: {:?}", key_sizes);
     let encryption_key = find_key(&input, key_sizes[0]);
-    let key = String::from_utf8_lossy(&encryption_key);
+    let key_string = String::from_utf8_lossy(&encryption_key);
     let decrypted_bytes = xor_decrypt_with_repeating_key(&input, &encryption_key);
     let message_decrypted = String::from_utf8_lossy(&decrypted_bytes);
-    println!("found: {key}");
+    println!("found: {key_string}");
     println!("decrypted message: {message_decrypted}");
 }
