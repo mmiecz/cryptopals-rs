@@ -12,7 +12,7 @@ pub fn xor_decrypt(ciphertext: &[u8], key: &[u8]) -> Vec<u8> {
 }
 
 /// Decrypts message with single byte key
-pub fn xor_decrypt_single_byte(ciphertext: &[u8], key: u8) -> Vec<u8> {
+pub fn xor_decrypt_with_single_byte(ciphertext: &[u8], key: u8) -> Vec<u8> {
     let key_repeated = vec![key; ciphertext.len()];
     xor_decrypt(ciphertext, &key_repeated)
 }

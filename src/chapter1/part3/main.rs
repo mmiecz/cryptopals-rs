@@ -29,7 +29,7 @@ fn main() {
     let mut score_heap = BinaryHeap::new();
     let english_detector = EnglishDetector::init("assets/words.txt").expect("Can't open dict file");
     for key in 0..=255 {
-        let key_decrypted = xor::xor_decrypt_single_byte(&encrypted, key);
+        let key_decrypted = xor::xor_decrypt_with_single_byte(&encrypted, key);
         let score = english_detector.detect_english(&key_decrypted);
         score_heap.push(ScoredKey {
             score,

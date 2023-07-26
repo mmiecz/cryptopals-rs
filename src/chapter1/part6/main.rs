@@ -1,7 +1,7 @@
 use common::{
     english_detector::EnglishDetector,
     hamming::hamming,
-    xor::{xor_decrypt_single_byte, xor_decrypt_with_repeating_key},
+    xor::{xor_decrypt_with_single_byte, xor_decrypt_with_repeating_key},
 };
 use log::{debug, info};
 
@@ -52,7 +52,7 @@ fn find_best_single_xor_key(input: &[u8], key_len: usize) -> u8 {
     }
     let mut max_score_byte: (f32, u8) = (0.0, 0);
     for k in 0..255 {
-        let decoded_bytes = xor_decrypt_single_byte(input, k); // decodes input string, result will be used to determine xor key score
+        let decoded_bytes = xor_decrypt_with_single_byte(input, k); // decodes input string, result will be used to determine xor key score
         let mut score = 0.0;
         for byte in decoded_bytes.iter() {
             score += EnglishDetector::calculate_english_letter_score(*byte) as f32;
