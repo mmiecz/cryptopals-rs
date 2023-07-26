@@ -1,6 +1,6 @@
 /// Don't use this in prod! ECB
 /// Key size is 128
-mod ecb_aes128 {
+pub mod ecb_aes128 {
     use aes::cipher::generic_array::GenericArray;
     use aes::cipher::{BlockDecrypt, BlockEncrypt, KeyInit};
     use aes::Aes128;
@@ -27,11 +27,11 @@ mod ecb_aes128 {
     mod tests {
         use super::*;
         #[test]
-        fn decrypt_aes128_ecb() {
+        fn encrypt_decrypt_aes128_block() {
             let key = <[u8; 16]>::try_from("secret_key_16bit".as_bytes()).unwrap();
             let input_encrypt = <[u8; 16]>::try_from("secret_msg_16bit".as_bytes()).unwrap();
             let encrypted_block = encrypt_block(input_encrypt, key);
-
+            println!("{:x?}", encrypted_block);
             let input_decrypt = <[u8; 16]>::try_from(encrypted_block.as_slice()).unwrap();
             let decrypted = decrypt_block(input_decrypt, key);
             assert_eq!("secret_msg_16bit", String::from_utf8_lossy(&decrypted));
