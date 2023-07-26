@@ -1,7 +1,7 @@
 use common::{
     english_detector::EnglishDetector,
     hamming::hamming,
-    xor::{xor_decrypt_with_single_byte, xor_decrypt_with_repeating_key},
+    xor::{xor_decrypt_with_repeating_key, xor_decrypt_with_single_byte},
 };
 use log::{debug, info};
 
@@ -67,10 +67,9 @@ fn find_best_single_xor_key(input: &[u8], key_len: usize) -> u8 {
     max_score_byte.1
 }
 // transpose...
-fn transpose_ciphertext_from(input: &[u8], key_len: usize, from: usize) -> Vec<u8> {
-    let slice = &input[from..];
+fn transpose_ciphertext_from(input: &[u8], key_len: usize) -> Vec<u8> {
     let mut transposed_line: Vec<u8> = Vec::new();
-    for b in slice.iter().step_by(key_len) {
+    for b in input.iter().step_by(key_len) {
         transposed_line.push(*b);
     }
     transposed_line
@@ -82,7 +81,7 @@ fn find_key(input: &[u8], key_len: usize) -> Vec<u8> {
     //gather transpositions and find best key match for each
     let mut key = Vec::new();
     for i in 0..key_len {
-        let transposed = transpose_ciphertext_from(input, key_len, i);
+        let transposed = transpose_ciphertext_from(&input[i..], key_len);
         let key_elem = find_best_single_xor_key(&transposed, key_len);
         key.push(key_elem)
     }
