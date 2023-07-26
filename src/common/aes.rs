@@ -1,25 +1,26 @@
 /// Don't use this in prod! ECB
+/// Key size is 128
 mod ecb_aes128 {
     use aes::cipher::generic_array::GenericArray;
     use aes::cipher::{BlockDecrypt, BlockEncrypt, KeyInit};
     use aes::Aes128;
     /// Decrypts the *input* with *key*
     /// It's allocating new buffer and returns it
-    pub fn decrypt_block(input: [u8; 16], key: [u8; 16]) -> Vec<u8> {
+    pub fn decrypt_block(input: [u8; 16], key: [u8; 16]) -> [u8; 16] {
         let key = GenericArray::from(key);
         let cipher = Aes128::new(&key);
         let mut block = GenericArray::from(input);
         cipher.decrypt_block(&mut block);
-        block.as_slice().to_vec()
+        block.into()
     }
 
     /// Encrypts the *input* with *key*
     /// It's allocating new buffer and returns it
-    pub fn encrypt_block(input: [u8; 16], key: [u8; 16]) -> Vec<u8> {
+    pub fn encrypt_block(input: [u8; 16], key: [u8; 16]) -> [u8; 16] {
         let cipher = Aes128::new(&GenericArray::from(key));
         let mut block = GenericArray::from(input);
         cipher.encrypt_block(&mut block);
-        block.as_slice().to_vec()
+        block.into()
     }
 
     #[cfg(test)]
