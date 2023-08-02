@@ -1,5 +1,7 @@
 /// Don't use this in prod! ECB
 /// Key size is 128
+///
+pub const AES_BLOCK_SIZE: usize = 16;
 pub mod ecb_aes128 {
     use aes::cipher::generic_array::GenericArray;
     use aes::cipher::{BlockDecrypt, BlockEncrypt, KeyInit};
@@ -78,7 +80,7 @@ pub mod ecb_aes128 {
 
         #[test]
         fn ecrypt_decrypt_aes128_block() {
-            let key = <[u8; 16]>::try_from("secret_key_16bit".as_bytes()).unwrap();
+            let key = "secret_key_16bit".as_bytes().try_into().unwrap();
             let input_to_encrypt = "secret_msg_16bitsecret_msg_16bit".as_bytes();
             let encrypted = encrypt_slice(input_to_encrypt, key).unwrap();
             let decrypted = decrypt_slice(&encrypted, key).unwrap();
@@ -86,6 +88,39 @@ pub mod ecb_aes128 {
                 "secret_msg_16bitsecret_msg_16bit",
                 String::from_utf8_lossy(&decrypted)
             );
+        }
+    }
+}
+
+pub mod cbc_aes128 {
+    use super::ecb_aes128;
+    use crate::xor::xor_decrypt;
+    /// To decrypt CBC
+    /// Take IV and the key
+    /// To decrypt the block, apply ECB decrypt with the key,
+    /// and xor the result with previous ENCRYPTED block
+    /// First block is XORed with IV
+    pub struct Aes128CBC {
+        key: [u8; 16],
+        /// previous block, or in case of initial block decryption, IV
+        previous_block: [u8; 16],
+    }
+
+    impl Aes128CBC {
+        pub fn init(key: [u8; 16], iv: [u8; 16]) -> Aes128CBC {
+            Aes128CBC {
+                key,
+                previous_block: iv,
+            }
+        }
+
+        /// Give next block to decipher.
+        /// Updates internal state, and returns deciphered block
+        pub fn feed_block(&mut self, block: [u8; 16]) -> [u8; 16] {
+            let block_decrypted = ecb_aes128::decrypt_block(block, self.key);
+            let xored = xor_decrypt(&block_decrypted, &self.previous_block);
+            self.previous_block = block;
+            xored.try_into().unwrap()
         }
     }
 }
